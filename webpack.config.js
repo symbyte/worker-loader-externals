@@ -7,9 +7,31 @@ module.exports = {
     path: __dirname + "/dist",
     filename: "bundle.js"
   },
-  externals: {
-    'sqlite3': 'commonjs sqlite3'
-  },
+  externals: 
+    (function () {
+      var IGNORES = [
+        'buffer',
+        'fs',
+        'electron',
+        'sqlite3',
+        'JSONStream',
+        'request',
+        'zlib',
+        'bindings',
+        'leveldown',
+        'pouchdb',
+        'canvas'
+      ];
+      console.log('doing the ignores')
+      return function (context, request, callback) {
+        if (IGNORES.indexOf(request) >= 0) {
+          console.log('\n ignoring ', request, '\n')
+          return callback(null, "require('" + request + "')");
+        }
+        return callback();
+      };
+    })()
+,
   module: {
     loaders: [
       {
